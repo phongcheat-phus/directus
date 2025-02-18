@@ -1,0 +1,82 @@
+version: "3.8"
+
+networks:
+  api_network:
+    driver: bridge
+
+services:
+  database:
+    image: postgres:15
+    container_name: directus_postgres
+    restart: always
+    environment:
+       POSTGRES_USER: ${POSTGRES_USER}
+       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+       POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./data/database:/var/lib/postgresql/data
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "--host=localhost", "--username=${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      # start_interval: 5s
+      start_period: 30s
+
+  cache:
+    image: redis:6
+    healthcheck:
+      test: ["CMD-SHELL", "[ $$(redis-cli ping) = 'PONG' ]"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      # start_interval: 5s
+      start_period: 30s
+
+  directus:
+    image: directus/directus:11.3.5
+    ports:
+      - 8055:8055
+    volumes:
+      - ./uploads:/directus/uploads
+      - ./extensions:/directus/extensions
+
+    depends_on:
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    environment:
+      SECRET: ${DIRECTUS_SECRET}
+
+      DB_CLIENT: ${DB_CLIENT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+      CACHE_ENABLED: ${CACHE_ENABLED}
+      CACHE_AUTO_PURGE: ${CACHE_AUTO_PURGE}
+      CACHE_STORE: ${CACHE_STORE}
+      REDIS: ${REDIS}
+
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+  api:
+      build: .
+      # networks:
+      # - api_network
+      ports:
+      - "8000:8000"
+      depends_on:
+        database:
+          condition: service_healthy
+      environment:
+        DB_HOST: database
+        DB_USER: ${POSTGRES_USER}
+        DB_PASSWORD: ${POSTGRES_PASSWORD}
+        DB_DATABASE: ${POSTGRES_DB}
