@@ -17,10 +17,7 @@ COPY api/ /app/
 #open internal port 80000
 EXPOSE 8000
 
-# running api server 
+# running api server
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
-
-# FROM directus/directus:11.3.5
-
-# RUN npm install directus-extension-editorjs
