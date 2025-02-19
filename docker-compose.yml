@@ -1,9 +1,5 @@
 version: "3.8"
 
-networks:
-  api_network:
-    driver: bridge
-
 services:
   database:
     image: postgres:15
@@ -67,11 +63,9 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
 
   api:
-      build: .
-      # networks:
-      # - api_network
-      ports:
+    build: .
+    ports:
       - "8000:8000"
-      depends_on:
-        database:
-          condition: service_healthy
+    depends_on:
+      database:
+        condition: service_healthy
