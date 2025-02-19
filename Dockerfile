@@ -9,6 +9,7 @@ COPY api/requirements.txt .
 
 #depends running 
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pnpm install directus-extension-package-name
 
 #copy all file in api folder to app folder container 
 COPY api/ /app/
