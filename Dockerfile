@@ -1,20 +1,20 @@
-# ใช้ Base Image เป็น Python
+#image python 3.10
 FROM python:3.10
 
-# กำหนด Working Directory ใน Container
+#working directory container 
 WORKDIR /app
 
-# คัดลอกไฟล์ requirements.txt ไปใน Container
+#copy file requirements.txt to container 
 COPY api/requirements.txt .
 
-# ติดตั้ง Dependencies
+#depends running 
 RUN pip install --no-cache-dir -r requirements.txt
 
-# คัดลอกโค้ดทั้งหมดจากโฟลเดอร์ api/ ไปยัง /app
+#copy all file in api folder to app folder container 
 COPY api/ /app/
 
-# เปิดพอร์ต 8000
+#open internal port 80000
 EXPOSE 8000
 
-# รัน API Server
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# running api server 
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
