@@ -75,8 +75,3 @@ services:
       depends_on:
         database:
           condition: service_healthy
-      environment:
-        DB_HOST: database
-        DB_USER: ${POSTGRES_USER}
-        DB_PASSWORD: ${POSTGRES_PASSWORD}
-        DB_DATABASE: ${POSTGRES_DB}
