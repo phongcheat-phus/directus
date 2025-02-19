@@ -1,6 +1,7 @@
 #image python 3.10
 FROM python:3.10
 
+
 #working directory container 
 WORKDIR /app
 
@@ -9,7 +10,6 @@ COPY api/requirements.txt .
 
 #depends running 
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pnpm install directus-extension-package-name
 
 #copy all file in api folder to app folder container 
 COPY api/ /app/
@@ -19,3 +19,8 @@ EXPOSE 8000
 
 # running api server 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+
+# FROM directus/directus:11.3.5
+
+# RUN npm install directus-extension-editorjs

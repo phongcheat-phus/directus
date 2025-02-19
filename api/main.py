@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-import uvicorn
 
 app = FastAPI()
 
@@ -7,5 +6,11 @@ app = FastAPI()
 def read_root():
     return {"message": "Hello, World!"}
 
-# if __name__ == "__main__":
+@app.get("/health", status_code=200) 
+def health_check():
+    return {"status": "health"}
+
+
+# if __name__ == "__main__":  # ✅ รันแอปโดยตรง
+#     import uvicorn
 #     uvicorn.run(app, host="0.0.0.0", port=8000)
