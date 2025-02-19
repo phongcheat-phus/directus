@@ -68,8 +68,8 @@ services:
 
   api:
       build: .
-      networks:
-      - api_network
+      # networks:
+      # - api_network
       ports:
       - "8000:8000"
       depends_on:
