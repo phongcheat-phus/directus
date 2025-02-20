@@ -1,5 +1,6 @@
 version: "3.8"
 
+
 services:
   database:
     image: postgres:15
@@ -21,6 +22,7 @@ services:
       # start_interval: 5s
       start_period: 30s
 
+
   cache:
     image: redis:6
     healthcheck:
@@ -33,7 +35,7 @@ services:
 
   directus:
     image: directus/directus:11.3.5
-    build: Dockerfile-directus
+    build: .
     ports:
       - 8055:8055
     volumes:
@@ -63,10 +65,16 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
 
+
   api:
-    build: Dockerfile-api
+    build:
+      context: ./api
     ports:
       - "8000:8000"
+    volumes:
+      - ./api:/app
     depends_on:
       database:
-        condition: service_healthy
+        condition: service_healthy  
+
+      
