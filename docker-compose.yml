@@ -33,9 +33,7 @@ services:
 
   directus:
     image: directus/directus:11.3.5
-    
-    # build: 
-    #   context: ./
+    build: Dockerfile-directus
     ports:
       - 8055:8055
     volumes:
@@ -66,7 +64,7 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
 
   api:
-    build: .
+    build: Dockerfile-api
     ports:
       - "8000:8000"
     depends_on:
