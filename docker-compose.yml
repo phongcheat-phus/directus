@@ -70,7 +70,7 @@ services:
     build:
       context: ./api
     ports:
-      - "8000:8000"
+      - "3000:3000"
     volumes:
       - ./api:/app
     depends_on:
