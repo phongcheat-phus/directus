@@ -74,9 +74,11 @@ services:
     container_name: kong_postgres
     restart: always
     environment:
-      KONG_POSTGRES_USER: ${KONG_POSTGRES_USER}
-      KONG_POSTGRES_PASSWORD: ${KONG_POSTGRES_PASSWORD}
-      KONG_POSTGRES_DB: ${KONG_POSTGRES_DB}
+      POSTGRES_USER: OSdH5f 
+      POSTGRES_PASSWORD: bq0@HX^Tpq
+      POSTGRES_DB: kong_postgres
+      POSTGRES_INITDB_ARGS: "--auth=md5"
+
     volumes:
       - ./data/kong/database:/var/lib/postgresql/data
     expose:
@@ -87,12 +89,15 @@ services:
     command: "kong migrations bootstrap"
     restart: always
     environment:
-      KONG_DATABASE: ${KONG_DATABASE}
-      KONG_PG_HOST: ${KONG_PG_HOST}
-      KONG_PG_USER: ${KONG_PG_USER}
-      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD}
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: OSdH5f
+      KONG_PG_PASSWORD: bq0@HX^Tpq
+      KONG_PG_DATABASE: kong_postgres
     depends_on:
       - kong-database
+    expose:
+      - 5432
 
   kong:
     image: kong/kong-gateway:3.9.0.1
@@ -102,10 +107,11 @@ services:
       - "8001:8001"
       - "8000:8000"
     environment:
-      KONG_DATABASE: ${KONG_DATABASE}
-      KONG_PG_HOST: ${KONG_PG_HOST}
-      KONG_PG_USER: ${KONG_PG_USER}
-      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD}
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: OSdH5f
+      KONG_PG_PASSWORD: bq0@HX^Tpq
+      KONG_PG_DATABASE: kong_postgres 
       KONG_PROXY_LISTEN: 0.0.0.0:8000
       KONG_PROXY_LISTEN_SSL: 0.0.0.0:8443
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
@@ -129,12 +135,12 @@ services:
     ports:
       - "1337:1337"
     environment:
-      DB_ADAPTER: ${DB_ADAPTER}
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_DATABASE: ${DB_DATABASE}
-      NODE_ENV: ${NODE_ENV}
+      DB_ADAPTER: postgres
+      DB_HOST: kong-database 
+      DB_USER: OSdH5f
+      DB_PASSWORD: bq0@HX^Tpq
+      DB_DATABASE: kong_postgres
+      NODE_ENV: production
     depends_on:
       - konga-prepare
   
