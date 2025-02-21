@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-  directus_database:
+  directus-database:
     image: postgres:15
     container_name: directus_postgres
     restart: always
@@ -19,6 +19,7 @@ services:
       retries: 5
       # start_interval: 5s
       start_period: 30s
+    
 
   cache:
     image: redis:6
@@ -29,7 +30,6 @@ services:
       retries: 5
       # start_interval: 5s
       start_period: 30s
-
   directus:
     image: directus/directus:11.3.5
     build: .
@@ -38,27 +38,23 @@ services:
     volumes:
       - ./uploads:/directus/uploads
       - ./extensions:/directus/extensions
-
     depends_on:
-      database:
+      directus-database:
         condition: service_healthy
       cache:
         condition: service_healthy
     environment:
-      SECRET: ${DIRECTUS_SECRET}
-
+      SECRET: ${SECRET}
       DB_CLIENT: ${DB_CLIENT}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
       DB_DATABASE: ${DB_DATABASE}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-
       CACHE_ENABLED: ${CACHE_ENABLED}
       CACHE_AUTO_PURGE: ${CACHE_AUTO_PURGE}
       CACHE_STORE: ${CACHE_STORE}
       REDIS: ${REDIS}
-
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
 
@@ -70,10 +66,10 @@ services:
     volumes:
       - ./api:/app
     depends_on:
-      database:
-        condition: service_healthy  
+      directus-database:
+        condition: service_healthy
 
-  kong_database:
+  kong-database:
     image: postgres:15
     container_name: kong_postgres
     restart: always
@@ -82,11 +78,11 @@ services:
       KONG_POSTGRES_PASSWORD: ${KONG_POSTGRES_PASSWORD}
       KONG_POSTGRES_DB: ${KONG_POSTGRES_DB}
     volumes:
-      - ./data/kong/database::/var/lib/postgresql/data
+      - ./data/kong/database:/var/lib/postgresql/data
     expose:
       - 5432
 
-  kong_migration:
+  kong-migration:
     image: kong/kong-gateway:3.9.0.1
     command: "kong migrations bootstrap"
     restart: always
@@ -96,11 +92,11 @@ services:
       KONG_PG_USER: ${KONG_PG_USER}
       KONG_PG_PASSWORD: ${KONG_PG_PASSWORD}
     depends_on:
-        - kong_database
+      - kong-database
 
   kong:
     image: kong/kong-gateway:3.9.0.1
-    container_name: kong_gateway
+    container_name: kong-gateway
     restart: always
     ports:
       - "8001:8001"
@@ -114,15 +110,17 @@ services:
       KONG_PROXY_LISTEN_SSL: 0.0.0.0:8443
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
     depends_on:
-      - kong_migration
+      - kong-migration
 
 
-  konga_prepare:
+  konga-prepare:
     image: pantsel/konga:next
     command: "-c prepare -a postgres -u postgresql://kong:kong@kong-database:5432/konga_db"
-    restart: on-failure
+    restart: always
     depends_on:
-      - kong_database
+      - kong-database
+    expose:
+      - 5432
 
   konga:
     image: pantsel/konga:next
@@ -131,14 +129,14 @@ services:
     ports:
       - "1337:1337"
     environment:
-      KONGA_DB_ADAPTER: postgres
-      KONGA_DB_HOST: kong-database
-      KONGA_DB_USER: kong
-      KONGA_DB_PASSWORD: kong
-      KONGA_DB_DATABASE: konga_db
-      KONGA_NODE_ENV: production
+      DB_ADAPTER: ${DB_ADAPTER}
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+      NODE_ENV: ${NODE_ENV}
     depends_on:
-      - konga_prepare
+      - konga-prepare
   
   
     
