@@ -74,11 +74,10 @@ services:
     container_name: kong_postgres
     restart: always
     environment:
-      POSTGRES_USER: OSdH5f 
+      POSTGRES_USER: kong 
       POSTGRES_PASSWORD: bq0@HX^Tpq
       POSTGRES_DB: kong_postgres
       POSTGRES_INITDB_ARGS: "--auth=md5"
-
     volumes:
       - ./data/kong/database:/var/lib/postgresql/data
     expose:
@@ -91,7 +90,7 @@ services:
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-database
-      KONG_PG_USER: OSdH5f
+      KONG_PG_USER: kong
       KONG_PG_PASSWORD: bq0@HX^Tpq
       KONG_PG_DATABASE: kong_postgres
     depends_on:
@@ -109,7 +108,7 @@ services:
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-database
-      KONG_PG_USER: OSdH5f
+      KONG_PG_USER: kong
       KONG_PG_PASSWORD: bq0@HX^Tpq
       KONG_PG_DATABASE: kong_postgres 
       KONG_PROXY_LISTEN: 0.0.0.0:8000
