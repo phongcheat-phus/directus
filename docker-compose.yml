@@ -1,8 +1,6 @@
 version: "3.8"
-
-
 services:
-  database:
+  directus_database:
     image: postgres:15
     container_name: directus_postgres
     restart: always
@@ -11,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - ./data/database:/var/lib/postgresql/data
+      - ./data/directus/database:/var/lib/postgresql/data
     expose:
       - 5432
     healthcheck:
@@ -21,7 +19,6 @@ services:
       retries: 5
       # start_interval: 5s
       start_period: 30s
-
 
   cache:
     image: redis:6
@@ -65,7 +62,6 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
 
-
   api:
     build:
       context: ./api
@@ -76,5 +72,26 @@ services:
     depends_on:
       database:
         condition: service_healthy  
+
+  kong_database:
+    image: postgres:15
+    container_name: kong_postgres
+    restart: always
+    environment:
+      KONG_POSTGRES_USER: ${KONG_POSTGRES_USER}
+      KONG_POSTGRES_PASSWORD: ${KONG_POSTGRES_PASSWORD}
+      KONG_POSTGRES_DB: ${KONG_POSTGRES_DB}
+    volumes:
+      - ./data/kong/database::/var/lib/postgresql/data
+    expose:
+      - 5432
+    healthcheck:
+      test: ["CMD", "pg_isready", "--host=localhost", "--username=${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    
+
 
       
