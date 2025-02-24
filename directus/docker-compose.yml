@@ -1,62 +1,63 @@
-version: "3.8"
-
+version: "3"
 services:
-  directus-database:
+  database:
     image: postgres:15
-    container_name: directus-database
-    restart: always
-    environment:
-      POSTGRES_USER: OSdH5f
-      POSTGRES_PASSWORD: bq0@HX^Tpq
-      POSTGRES_DB: db-directus
+    container_name: database
     volumes:
-      - ./data/directus/database:/var/lib/postgresql/data
-    expose:
-      - 5432
+      - ./postgres/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "directus"
+      POSTGRES_PASSWORD: "directus"
+      POSTGRES_DB: "directus"
     healthcheck:
-      test: ["CMD", "pg_isready", " --host=localhost", "--username=${POSTGRES_USER}"]
+      test: ["CMD", "pg_isready", "--host=localhost", "--username=${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-    
+    expose:
+      - 5432
+
   cache:
     image: redis:6
+    container_name: cache
     healthcheck:
       test: ["CMD-SHELL", "[ $$(redis-cli ping) = 'PONG' ]"]
       interval: 10s
       timeout: 5s
       retries: 5
-      # start_interval: 5s
       start_period: 30s
+
   directus:
-    image: directus/directus:11.3.5
+    image: directus/directus:11.4.1
     container_name: directus
+    build: ./Docerfile
     ports:
       - 8055:8055
     volumes:
       - ./uploads:/directus/uploads
       - ./extensions:/directus/extensions
     depends_on:
-      directus-database:
+      database:
         condition: service_healthy
       cache:
         condition: service_healthy
     environment:
-      SECRET: ${SECRET}
-      DB_CLIENT: ${DB_CLIENT}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      CACHE_ENABLED: ${CACHE_ENABLED}
-      CACHE_AUTO_PURGE: ${CACHE_AUTO_PURGE}
-      CACHE_STORE: ${CACHE_STORE}
-      REDIS: ${REDIS}
-      ADMIN_EMAIL: ${ADMIN_EMAIL}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      DB_CLIENT: pg
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_DATABASE: directus
+      DB_USER: directus
+      DB_PASSWORD: directus
 
+      CACHE_ENABLED: true
+      CACHE_AUTO_PURGE: true
+      CACHE_STORE: redis
+      REDIS: redis://cache:6379
+
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: d1r3ctu5
+   
   api:
     container_name: api
     build:
@@ -66,5 +67,5 @@ services:
     volumes:
       - ./api:/app
     depends_on:
-      directus-database:
+     database:
         condition: service_healthy
