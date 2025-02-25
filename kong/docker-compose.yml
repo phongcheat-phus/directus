@@ -1,20 +1,19 @@
 version: '3.8'
-
 services:
   kong-database:
     image: postgres:15
     container_name: kong-database
     restart: always
     environment:
-      POSTGRES_USER: ${KONG_DB_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${KONG_DB_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${KONG_DB_POSTGRES_DB}
+      POSTGRES_USER: "abcd"
+      POSTGRES_PASSWORD: "abcd"
+      POSTGRES_DB: "kong"
       POSTGRES_INITDB_ARGS: --auth=md5
     volumes:
-      - /kong-pg:/var/lib/postgresql/data
+      - ./kong-pg:/var/lib/postgresql/data
     expose:
       - 5432
-      
+
   kong-migrations:
     image: kong:3.5.0
     container_name: kong-migrations
@@ -22,10 +21,10 @@ services:
     depends_on:
       - kong-database
     environment:
-      KONG_DATABASE: ${KONG_MG_DATABASE}
-      KONG_PG_HOST: ${KONG_MG_PG_HOST}
-      KONG_PG_USER: ${KONG_MG_PG_USER}
-      KONG_PG_PASSWORD: ${KONG_MG_PG_PASSWORD}
+      KONG_DATABASE: "postgres"
+      KONG_PG_HOST: "kong-database"
+      KONG_PG_USER: "abcd"
+      KONG_PG_PASSWORD: "abcd"
     expose:
       - 5432
 
@@ -36,30 +35,31 @@ services:
     depends_on:
       - kong-migrations
     environment:
-      KONG_DATABASE: ${KONG_DATABASE}
-      KONG_PG_HOST: ${KONG_PG_HOST}
-      KONG_PG_USER: ${KONG_PG_USER}
-      KONG_PG_PASSWORD: ${KONG_PG_PASSWORD}
+      KONG_DATABASE: "postgres"
+      KONG_PG_HOST: "kong-database"
+      KONG_PG_USER: "abcd"
+      KONG_PG_PASSWORD: "abcd"
       KONG_PROXY_LISTEN: 0.0.0.0:8000
       KONG_ADMIN_LISTEN: 0.0.0.0:8001
     ports:
       - "8000:8000"
       - "8443:8443"
       - "8001:8001"
-    
+
   konga-database:
     image: postgres:11
     container_name: konga-database
     restart: always
     environment:
-      POSTGRES_USER: ${KONGA_DB_POSTGRES_USER}
-      POSTGRES_PASSWORD: ${KONGA_DB_POSTGRES_PASSWORD}
-      POSTGRES_DB: ${KONGA_DB_POSTGRES_DB}
+      POSTGRES_USER: "abc"
+      POSTGRES_PASSWORD: "abc"
+      POSTGRES_DB: "konga"
     volumes:
-      - /konga-db:/var/lib/postgresql/data
+      - ./konga-db:/var/lib/postgresql/data
     expose:
       - 5432
 
+      
   konga:
     image: pantsel/konga:latest
     container_name: konga
@@ -67,16 +67,20 @@ services:
     depends_on:
       - konga-database
     environment:
-      DB_ADAPTER: ${KONGA_DB_ADAPTER}
-      DB_HOST: ${KONGA_DB_HOST}
-      DB_PORT: ${KONGA_DB_PORT}
-      DB_USER: ${KONGA_DB_USER}
-      DB_PASSWORD: ${KONGA_DB_PASSWOTD}
-      DB_DATABASE: ${KONG_DB_DATABASE}
+      DB_ADAPTER: "postgres"
+      DB_HOST: "konga-database"
+      DB_PORT: "5432"
+      DB_USER:  "abc"
+      DB_PASSWORD: "abc"
+      DB_DATABASE: "konga"
     volumes:
-      - /konga/data:/var/lib/postgresql/data
-      - /konga-app:/app/konga-data 
+      - ./konga/data:/var/lib/postgresql/data
+      - ./konga-app:/app/konga-data 
     ports:
       - "1337:1337"
 
+networks:
+  default:           
+    name: web-app
+    external: true
       
