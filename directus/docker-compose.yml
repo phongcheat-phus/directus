@@ -6,9 +6,9 @@ services:
     volumes:
       - ./postgres/data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: "vrqxbG"
-      POSTGRES_PASSWORD: "cXrHAWf2V5"
-      POSTGRES_DB: "directus-database"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_INITDB_ARGS: "--auth=md5"
     healthcheck:
       test: ["CMD", "pg_isready", "--host=localhost", "--username=${POSTGRES_USER}"]
@@ -32,7 +32,8 @@ services:
   directus:
     image: directus/directus:11.4.1
     container_name: directus
-    build: ./Docerfile
+    build: 
+      dockerfile: ./Dockerfile
     ports:
       - 8055:8055
     volumes:
@@ -44,20 +45,20 @@ services:
       cache:
         condition: service_healthy
     environment:
-      DB_CLIENT: "postgres"
-      DB_HOST: "database"
-      DB_PORT: "5432"
-      DB_DATABASE: "directus-database"
-      DB_USER: "vrqxbG"
-      DB_PASSWORD: "cXrHAWf2V5"
+      DB_CLIENT: ${DB_CLIENT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
 
       CACHE_ENABLED: "true"
       CACHE_AUTO_PURGE: "true"
       CACHE_STORE: redis
       REDIS: redis://cache:6379
 
-      ADMIN_EMAIL: admin@example.com
-      ADMIN_PASSWORD: d1r3ctu5
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
    
   api:
     container_name: api
