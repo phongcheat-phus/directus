@@ -14,8 +14,7 @@ services:
       - ./kong/postgres:/var/lib/postgresql/data
     expose:
       - 5432
-
-
+      
   kong-migrations:
     image: kong:3.5.0
     container_name: kong-migrations
