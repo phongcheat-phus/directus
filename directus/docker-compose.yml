@@ -1,4 +1,5 @@
 version: "3.8"
+
 services:
   database:
     image: postgres:15
@@ -28,6 +29,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
 
   directus:
     image: directus/directus:11.4.1
@@ -59,6 +61,7 @@ services:
 
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
    
   api:
     container_name: api
@@ -71,3 +74,8 @@ services:
     depends_on:
      database:
         condition: service_healthy
+
+networks:
+  default:           
+    name: web-app
+    external: true
